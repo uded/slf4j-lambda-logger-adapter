@@ -8,8 +8,8 @@ import org.slf4j.Logger;
  */
 public class Slf4jLambdaLoggerFactory implements ILoggerFactory {
 
-	public Logger getLogger(String level) {
-		Slf4jLambdaLogLevel logLevel = Slf4jLambdaLogLevel.valueOf(level);
+	public Logger getLogger(String className) {
+		Slf4jLambdaLogLevel logLevel = Slf4jLambdaLogLevel.INFO;
 		return new Slf4jLambdaLogger(logLevel);
 	}
 }

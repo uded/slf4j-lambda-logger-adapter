@@ -168,7 +168,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void info(String msg) {
-		if (!isDebugEnabled()) {
+		if (!isInfoEnabled()) {
 			return;
 		}
 
@@ -180,7 +180,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg
 	 */
 	public void info(String format, Object arg) {
-		if (isDebugEnabled()) {
+		if (isInfoEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
 			System.out.println(formattingTuple.getMessage());
 		}
@@ -192,7 +192,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg2   the second argument
 	 */
 	public void info(String format, Object arg1, Object arg2) {
-		if (isDebugEnabled()) {
+		if (isInfoEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
 			System.out.println(formattingTuple.getMessage());
 		}
@@ -203,7 +203,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param argArray an array of arguments
 	 */
 	public void info(String format, Object[] argArray) {
-		if (isDebugEnabled()) {
+		if (isInfoEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
 			System.out.println(formattingTuple.getMessage());
 		}
@@ -214,7 +214,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param ex
 	 */
 	public void info(String msg, Throwable ex) {
-		if (isDebugEnabled()) {
+		if (isInfoEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
 			System.out.println(formattingTuple.getMessage());
 		}
@@ -238,7 +238,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void warn(String msg) {
-		if (!isDebugEnabled()) {
+		if (!isWarnEnabled()) {
 			return;
 		}
 
@@ -250,7 +250,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg
 	 */
 	public void warn(String format, Object arg) {
-		if (isDebugEnabled()) {
+		if (isWarnEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -262,7 +262,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg2   the second argument
 	 */
 	public void warn(String format, Object arg1, Object arg2) {
-		if (isDebugEnabled()) {
+		if (isWarnEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -273,7 +273,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param argArray an array of arguments
 	 */
 	public void warn(String format, Object[] argArray) {
-		if (isDebugEnabled()) {
+		if (isWarnEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -284,7 +284,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param ex
 	 */
 	public void warn(String msg, Throwable ex) {
-		if (isDebugEnabled()) {
+		if (isWarnEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -309,7 +309,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void error(String msg) {
-		if (!isDebugEnabled()) {
+		if (!isErrorEnabled()) {
 			return;
 		}
 
@@ -321,7 +321,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg
 	 */
 	public void error(String format, Object arg) {
-		if (isDebugEnabled()) {
+		if (isErrorEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -333,7 +333,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param arg2   the second argument
 	 */
 	public void error(String format, Object arg1, Object arg2) {
-		if (isDebugEnabled()) {
+		if (isErrorEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -344,7 +344,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param argArray an array of arguments
 	 */
 	public void error(String format, Object[] argArray) {
-		if (isDebugEnabled()) {
+		if (isErrorEnabled()) {
 			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
 			System.err.println(formattingTuple.getMessage());
 		}
@@ -355,7 +355,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param ex
 	 */
 	public void error(String msg, Throwable ex) {
-		if (isDebugEnabled()) {
+		if (isErrorEnabled()) {
 			System.err.println(msg);
 		}
 	}
