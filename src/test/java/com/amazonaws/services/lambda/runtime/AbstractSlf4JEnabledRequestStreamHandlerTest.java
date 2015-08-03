@@ -20,6 +20,8 @@ public class AbstractSlf4JEnabledRequestStreamHandlerTest extends AbstractSlf4jE
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
 		handleRequest(input, output, getContext());
 		assertEquals("Messages did not match", "Hello", new String(output.toByteArray()));
+		input.close();
+		output.close();
 	}
 
 	@Override
@@ -27,7 +29,6 @@ public class AbstractSlf4JEnabledRequestStreamHandlerTest extends AbstractSlf4jE
 		final Logger logger = LoggerFactory.getLogger(AbstractSlf4JEnabledRequestHandlerTest.class);
 		final Scanner scanner = new Scanner(input).useDelimiter("\\A");
 		final String message = scanner.hasNext() ? scanner.next() : "";
-		input.close();
 		logger.info("Logging message - " + message);
 		output.write(message.getBytes());
 	}
