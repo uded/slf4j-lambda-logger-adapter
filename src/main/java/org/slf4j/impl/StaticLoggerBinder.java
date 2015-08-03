@@ -1,6 +1,5 @@
 package org.slf4j.impl;
 
-import com.amazonaws.services.lambda.runtime.Slf4jLambdaLoggerFactory;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -9,7 +8,7 @@ import org.slf4j.ILoggerFactory;
 public class StaticLoggerBinder {
 
 	public static String REQUESTED_API_VERSION = "1.7";
-	private static final String LOGGER_FACTORY_CLASS_STR = Slf4jLambdaLoggerFactory.class.getName();
+	private static final String LOGGER_FACTORY_CLASS_STR = LambdaLoggerFactory.class.getName();
 	private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
 	private final ILoggerFactory loggerFactory;
 
@@ -24,7 +23,7 @@ public class StaticLoggerBinder {
 	 * Private constructor
 	 */
 	private StaticLoggerBinder() {
-		loggerFactory = new Slf4jLambdaLoggerFactory();
+		loggerFactory = new LambdaLoggerFactory();
 	}
 
 	/**

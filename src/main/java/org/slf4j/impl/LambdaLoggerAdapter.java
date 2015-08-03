@@ -1,46 +1,48 @@
-package com.amazonaws.services.lambda.runtime;
+package org.slf4j.impl;
 
-import org.slf4j.Marker;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
+import org.slf4j.Logger;
 import org.slf4j.helpers.FormattingTuple;
 import org.slf4j.helpers.MarkerIgnoringBase;
 import org.slf4j.helpers.MessageFormatter;
-import org.slf4j.spi.LocationAwareLogger;
 
+import java.io.PrintWriter;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.util.Arrays;
 
 /**
  * @author <a href="mailto:d@davemaple.com">David Maple</a>
  */
-public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwareLogger, Serializable {
+public class LambdaLoggerAdapter extends MarkerIgnoringBase implements Logger, Serializable {
 
-	private final Slf4jLambdaLogLevel level;
+	private final LambdaLogLevel level;
+	private final LambdaLogger logger;
 
 	/**
-	 *
 	 * @param level
+	 * @param logger
 	 */
-	Slf4jLambdaLogger(Slf4jLambdaLogLevel level) {
+	LambdaLoggerAdapter(LambdaLogLevel level, LambdaLogger logger) {
 		this.level = level;
 		name = this.getClass().getSimpleName();
+		this.logger = logger;
 	}
 
 	/**
 	 * @return isTraceCapable
 	 */
 	public boolean isTraceEnabled() {
-		return level.equals(Slf4jLambdaLogLevel.TRACE);
+		return level.equals(LambdaLogLevel.TRACE);
 	}
 
 	/**
 	 * @param msg
 	 */
 	public void trace(String msg) {
-		if (!isTraceEnabled()) {
-			return;
+		if (isTraceEnabled()) {
+			log(LambdaLogLevel.TRACE, msg);
 		}
-
-		System.out.println(msg);
 	}
 
 	/**
@@ -49,8 +51,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void trace(String format, Object arg) {
 		if (isTraceEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.TRACE, format, arg);
 		}
 	}
 
@@ -61,8 +62,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void trace(String format, Object arg1, Object arg2) {
 		if (isTraceEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.TRACE, format, arg1, arg2);
 		}
 	}
 
@@ -72,8 +72,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void trace(String format, Object[] argArray) {
 		if (isTraceEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.TRACE, format, argArray);
 		}
 	}
 
@@ -83,8 +82,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void trace(String msg, Throwable ex) {
 		if (isTraceEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.TRACE, msg, ex);
 		}
 	}
 
@@ -92,18 +90,16 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @return isDebugEnabled
 	 */
 	public boolean isDebugEnabled() {
-		return Arrays.asList(Slf4jLambdaLogLevel.TRACE, Slf4jLambdaLogLevel.DEBUG).contains(level);
+		return Arrays.asList(LambdaLogLevel.TRACE, LambdaLogLevel.DEBUG).contains(level);
 	}
 
 	/**
 	 * @param msg
 	 */
 	public void debug(String msg) {
-		if (!isDebugEnabled()) {
-			return;
+		if (isDebugEnabled()) {
+			log(LambdaLogLevel.DEBUG, msg);
 		}
-
-		System.out.println(msg);
 	}
 
 	/**
@@ -112,8 +108,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void debug(String format, Object arg) {
 		if (isDebugEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.DEBUG, format, arg);
 		}
 	}
 
@@ -124,8 +119,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void debug(String format, Object arg1, Object arg2) {
 		if (isDebugEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.DEBUG, format, arg1, arg2);
 		}
 	}
 
@@ -135,8 +129,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void debug(String format, Object[] argArray) {
 		if (isDebugEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.DEBUG, format, argArray);
 		}
 	}
 
@@ -146,8 +139,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void debug(String msg, Throwable ex) {
 		if (isDebugEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.DEBUG, msg, ex);
 		}
 	}
 
@@ -158,9 +150,9 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public boolean isInfoEnabled() {
 		return Arrays.asList(
-				Slf4jLambdaLogLevel.TRACE,
-				Slf4jLambdaLogLevel.DEBUG,
-				Slf4jLambdaLogLevel.INFO
+				LambdaLogLevel.TRACE,
+				LambdaLogLevel.DEBUG,
+				LambdaLogLevel.INFO
 		).contains(level);
 	}
 
@@ -168,11 +160,9 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void info(String msg) {
-		if (!isInfoEnabled()) {
-			return;
+		if (isInfoEnabled()) {
+			log(LambdaLogLevel.INFO, msg);
 		}
-
-		System.out.println(msg);
 	}
 
 	/**
@@ -181,8 +171,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void info(String format, Object arg) {
 		if (isInfoEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.INFO, format, arg);
 		}
 	}
 
@@ -193,8 +182,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void info(String format, Object arg1, Object arg2) {
 		if (isInfoEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.INFO, format, arg1, arg2);
 		}
 	}
 
@@ -204,8 +192,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void info(String format, Object[] argArray) {
 		if (isInfoEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.INFO, format, argArray);
 		}
 	}
 
@@ -215,8 +202,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void info(String msg, Throwable ex) {
 		if (isInfoEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
-			System.out.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.INFO, msg, ex);
 		}
 	}
 
@@ -227,10 +213,10 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public boolean isWarnEnabled() {
 		return Arrays.asList(
-				Slf4jLambdaLogLevel.TRACE,
-				Slf4jLambdaLogLevel.DEBUG,
-				Slf4jLambdaLogLevel.INFO,
-				Slf4jLambdaLogLevel.WARN
+				LambdaLogLevel.TRACE,
+				LambdaLogLevel.DEBUG,
+				LambdaLogLevel.INFO,
+				LambdaLogLevel.WARN
 		).contains(level);
 	}
 
@@ -238,11 +224,9 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void warn(String msg) {
-		if (!isWarnEnabled()) {
-			return;
+		if (isWarnEnabled()) {
+			log(LambdaLogLevel.WARN, msg);
 		}
-
-		System.err.println(msg);
 	}
 
 	/**
@@ -251,8 +235,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void warn(String format, Object arg) {
 		if (isWarnEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.WARN, format, arg);
 		}
 	}
 
@@ -263,8 +246,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void warn(String format, Object arg1, Object arg2) {
 		if (isWarnEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.WARN, format, arg1, arg2);
 		}
 	}
 
@@ -274,8 +256,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void warn(String format, Object[] argArray) {
 		if (isWarnEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.WARN, format, argArray);
 		}
 	}
 
@@ -285,8 +266,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void warn(String msg, Throwable ex) {
 		if (isWarnEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(msg, ex);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.WARN, msg, ex);
 		}
 	}
 
@@ -297,11 +277,11 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public boolean isErrorEnabled() {
 		return Arrays.asList(
-				Slf4jLambdaLogLevel.TRACE,
-				Slf4jLambdaLogLevel.DEBUG,
-				Slf4jLambdaLogLevel.INFO,
-				Slf4jLambdaLogLevel.WARN,
-				Slf4jLambdaLogLevel.ERROR
+				LambdaLogLevel.TRACE,
+				LambdaLogLevel.DEBUG,
+				LambdaLogLevel.INFO,
+				LambdaLogLevel.WARN,
+				LambdaLogLevel.ERROR
 		).contains(level);
 	}
 
@@ -309,11 +289,9 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 * @param msg
 	 */
 	public void error(String msg) {
-		if (!isErrorEnabled()) {
-			return;
+		if (isErrorEnabled()) {
+			log(LambdaLogLevel.ERROR, msg);
 		}
-
-		System.err.println(msg);
 	}
 
 	/**
@@ -322,8 +300,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void error(String format, Object arg) {
 		if (isErrorEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.ERROR, format, arg);
 		}
 	}
 
@@ -334,8 +311,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void error(String format, Object arg1, Object arg2) {
 		if (isErrorEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, arg1, arg2);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.ERROR, format, arg1, arg2);
 		}
 	}
 
@@ -345,8 +321,7 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void error(String format, Object[] argArray) {
 		if (isErrorEnabled()) {
-			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
-			System.err.println(formattingTuple.getMessage());
+			log(LambdaLogLevel.ERROR, format, argArray);
 		}
 	}
 
@@ -356,24 +331,83 @@ public class Slf4jLambdaLogger extends MarkerIgnoringBase implements LocationAwa
 	 */
 	public void error(String msg, Throwable ex) {
 		if (isErrorEnabled()) {
-			System.err.println(msg);
+			log(LambdaLogLevel.ERROR, msg, ex);
 		}
 	}
 
 	/**
-	 * @param marker
-	 * @param callerFQCN
 	 * @param level
 	 * @param msg
+	 */
+	private void log(LambdaLogLevel level, String msg) {
+		log(level, msg, null, null);
+	}
+
+	/**
+	 * @param level
+	 * @param msg
+	 * @param ex
+	 */
+	private void log(LambdaLogLevel level, String msg, Throwable ex) {
+		log(level, msg, null, ex);
+	}
+
+	/**
+	 * @param level
+	 * @param format
+	 * @param arg
+	 */
+	private void log(LambdaLogLevel level, String format, Object arg) {
+		log(level, format, new Object[]{arg});
+	}
+
+	/**
+	 * @param level
+	 * @param format
+	 * @param arg1
+	 * @param arg2
+	 */
+	private void log(LambdaLogLevel level, String format, Object arg1, Object arg2) {
+		log(level, format, new Object[]{arg1, arg2});
+	}
+
+	/**
+	 * @param level
+	 * @param format
+	 * @param argArray
+	 */
+	private void log(LambdaLogLevel level, String format, Object[] argArray) {
+		log(level, format, argArray, null);
+	}
+
+	/**
+	 * @param level
+	 * @param format
 	 * @param argArray
 	 * @param ex
 	 */
-	public void log(Marker marker,
-					String callerFQCN,
-					int level,
-					String msg,
+	private void log(
+			      LambdaLogLevel level,
+					String format,
 					Object[] argArray,
 					Throwable ex) {
-		System.out.println(msg);
+		String entry = level + ": ";
+
+		if (argArray != null && argArray.length > 0) {
+			FormattingTuple formattingTuple = MessageFormatter.format(format, argArray);
+			entry += formattingTuple.getMessage();
+		} else {
+			entry += format;
+		}
+
+		if (ex != null) {
+			final StringWriter sw = new StringWriter();
+			final PrintWriter pw = new PrintWriter(sw);
+			ex.printStackTrace(pw);
+			entry += "\nWith exception: " + ex.getMessage() + "\nStack trace:\n" + sw;
+		}
+
+		logger.log(entry);
 	}
+
 }
